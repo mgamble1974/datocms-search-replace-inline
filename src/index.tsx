@@ -1,6 +1,6 @@
-import { connect } from 'datocms-plugin-sdk';
+import { connect, Field } from 'datocms-plugin-sdk';
 import { render } from './utils/render';
-import InlinePanel from './entrypoints/InlinePanel';
+import FieldAddon from './entrypoints/FieldAddon';
 import ConfigScreen from './entrypoints/ConfigScreen';
 import 'datocms-react-ui/styles.css';
 
@@ -9,18 +9,28 @@ connect({
     render(<ConfigScreen ctx={ctx} />);
   },
 
-  itemFormOutlets() {
+  manualFieldExtensions() {
     return [
       {
         id: 'searchReplace',
-        rank: 1,
+        name: 'Zoeken & vervangen',
+        type: 'addon',
+        fieldTypes: ['structured_text'],
       },
     ];
   },
 
-  renderItemFormOutlet(outletId, ctx) {
-    if (outletId === 'searchReplace') {
-      render(<InlinePanel ctx={ctx} />);
+  overrideFieldExtensions(field: Field) {
+    if (field.attributes.api_key === 'article_content_body') {
+      return {
+        addons: [{ id: 'searchReplace' }],
+      };
+    }
+  },
+
+  renderFieldExtension(fieldExtensionId, ctx) {
+    if (fieldExtensionId === 'searchReplace') {
+      render(<FieldAddon ctx={ctx} />);
     }
   },
 });
